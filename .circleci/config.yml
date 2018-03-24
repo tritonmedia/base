@@ -1,0 +1,38 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: docker:17.05.0-ce-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          keys:
+            - v1-{{ .Branch }}
+          paths:
+            - /caches/base.tar
+      - run: docker build --cache-from=base -t base .
+      - run:
+          name: Save Docker image layer cache
+          command: |
+            mkdir -p /caches
+            docker save -o /caches/base.tar base
+      - save_cache:
+          key: v1-{{ .Branch }}-{{ epoch }}
+          paths:
+            - /caches/base.tar
+      - run:
+          name: Publish Docker Image
+          command: |
+            set -e
+            docker login --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}"
+            case "$CIRCLE_BRANCH" in
+              master) export moving_tag="prod"
+                ;;
+              stage) export moving_tag="beta"
+                ;;
+              *) export moving_tag="alpha"
+                ;;
+            esac
+            docker tag base "jaredallard/triton-base:${moving_tag}"
+            docker push "jaredallard/triton-base:${moving_tag}"
