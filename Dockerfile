@@ -26,7 +26,7 @@ RUN echo '@edge http://dl-cdn.alpinelinux.org/alpine/edge/main' >> /etc/apk/repo
 RUN apk add --no-cache dumb-init redis bash git jq
 
 # Copy over the entry-point
-COPY docker/docker-entrypoint /usr/bin/docker-entrypoint
+COPY docker-entrypoint /usr/bin/docker-entrypoint
 RUN chmod +x /usr/bin/docker-entrypoint
 
 # Weird state issues?
