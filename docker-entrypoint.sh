@@ -65,7 +65,6 @@ fi
 
 
 echo "INFO: bootstrap complete."
-yarn install
 
 echo "cmd: $(pwd)"
 echo -n "exec: "
