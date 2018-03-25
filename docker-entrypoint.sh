@@ -14,7 +14,6 @@ export DEBUG_COLORS=true
 echo "Started: $(date)"
 echo "opts: $@"
 echo "user: `whoami`"
-ls -alv
 
 if [[ -z "$REDIS" ]]; then
   export REDIS="redis://media-redis:6379"
