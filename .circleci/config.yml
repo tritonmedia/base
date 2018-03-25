@@ -1,7 +1,6 @@
 version: 2
 jobs:
   build:
-    context: docker
     docker:
       - image: docker:17.05.0-ce-git
     steps:
@@ -29,3 +28,10 @@ jobs:
             docker login --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}"
             docker tag base "jaredallard/triton-base:latest"
             docker push "jaredallard/triton-base:latest"
+
+workflows:
+  version: 2
+  build-push:
+    jobs:
+      - build:
+          context: Docker
