@@ -31,7 +31,18 @@ REDIS_PORT=`echo $REDIS | awk -F ':' '{ print $3 }'`
 echo "INFO: waiting for redis '$REDIS' ($REDIS_HOST:$REDIS_PORT)"
 PING_RESPONSE=""
 while [[ $PING_RESPONSE != "PONG" ]]; do
-  PING_RESPONSE=`timeout -t 3 redis-cli -h $REDIS_HOST -p $REDIS_PORT PING`
+
+  # From: https://github.com/vishnubob/wait-for-it/blob/master/wait-for-it.sh
+  TIMEOUT_PATH=$(realpath $(which timeout))
+  if [[ $TIMEOUT_PATH =~ "busybox" ]]; then
+          ISBUSY=1
+          BUSYTIMEFLAG="-t"
+  else
+          ISBUSY=0
+          BUSYTIMEFLAG=""
+  fi
+
+  PING_RESPONSE=`timeout $BUSYTIMEFLAG 3 redis-cli -h $REDIS_HOST -p $REDIS_PORT PING`
   echo $PING_RESPONSE
   sleep 1
 done
