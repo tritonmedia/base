@@ -23,7 +23,7 @@ RUN echo '@edge http://dl-cdn.alpinelinux.org/alpine/edge/main' >> /etc/apk/repo
  &&   apk upgrade --no-cache --no-self-upgrade --available
 
 # Install our deps
-RUN apk add --no-cache dumb-init redis bash git jq
+RUN apk add --no-cache dumb-init redis bash jq
 
 # Copy over the entry-point
 COPY docker-entrypoint.sh /usr/bin/docker-entrypoint
