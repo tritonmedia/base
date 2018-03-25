@@ -30,4 +30,7 @@ COPY docker-entrypoint.sh /usr/bin/docker-entrypoint
 RUN chmod +x /usr/bin/docker-entrypoint
 
 # Weird state issues?
-RUN rm -rf /stack && mkdir /stack && chown -R media:ping /stack && chmod -R 755 /stack
+RUN rm -rf /stack /config && \
+    mkdir /stack /config && \
+    chown -R media:ping /stack /config && \
+    chmod -R 755 /stack /config

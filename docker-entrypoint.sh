@@ -38,12 +38,6 @@ while [[ $PING_RESPONSE != "PONG" ]]; do
 done
 echo "INFO: redis is up"
 
-# Bootstrap the configs
-# Create the config directory
-if [[ ! -d "./config" ]]; then
-  mkdir ./config || exit 1
-fi
-
 # Check for kubernetes mounted secrets
 if [[ ! -e "/mnt/config/config.yaml" ]]; then
   echo "WARN: Config not found at /mnt/config, using environment variable"
@@ -54,9 +48,9 @@ if [[ ! -e "/mnt/config/config.yaml" ]]; then
   fi
 
   echo "INFO: inserting base64 decoded config into ./config/config.yaml"
-  echo "$CONFIG" | base64 -d > ./config/config.yaml
+  echo "$CONFIG" | base64 -d > /config/config.yaml
 else
-  ln -svf /mnt/config/config.yaml ./config/config.yaml
+  ln -svf /mnt/config/config.yaml /config/config.yaml
 fi
 
 
