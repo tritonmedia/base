@@ -3,17 +3,15 @@
 # (c) 2018 Jared Allard <jaredallard@outlook.com>
 #
 
-SERVICE=$1
 CMD=$2
-
 
 # Enable service debugging
 export DEBUG="media:*"
 export DEBUG_COLORS=true
 
 echo "Started: $(date)"
-echo "opts: $@"
-echo "user: `whoami`"
+echo "opts: $*"
+echo "user: $(whoami)"
 
 if [[ -z "$REDIS" ]]; then
   export REDIS="redis://media-redis:6379"
@@ -25,25 +23,22 @@ if [[ -z "$MEDIA" ]]; then
   echo "WARN: \$MEDIA undefined, defaulting to prod config..."
 fi
 
-REDIS_HOST=`echo $REDIS | sed 's/redis:\/\///g' | awk -F ':' '{ print $1 }'`
-REDIS_PORT=`echo $REDIS | awk -F ':' '{ print $3 }'`
+REDIS_HOST=$(echo $REDIS | sed 's/redis:\/\///g' | awk -F ':' '{ print $1 }')
+REDIS_PORT=$(echo $REDIS | awk -F ':' '{ print $3 }')
 
 echo "INFO: waiting for redis '$REDIS' ($REDIS_HOST:$REDIS_PORT)"
 PING_RESPONSE=""
 while [[ $PING_RESPONSE != "PONG" ]]; do
 
   # From: https://github.com/vishnubob/wait-for-it/blob/master/wait-for-it.sh
-  TIMEOUT_PATH=$(realpath $(which timeout))
+  TIMEOUT_PATH=$(realpath "$(which timeout)")
+  BUSYTIMEFLAG=""
   if [[ $TIMEOUT_PATH =~ "busybox" ]]; then
-          ISBUSY=1
-          BUSYTIMEFLAG="-t"
-  else
-          ISBUSY=0
-          BUSYTIMEFLAG=""
+    BUSYTIMEFLAG="-t"
   fi
 
-  PING_RESPONSE=`timeout $BUSYTIMEFLAG 3 redis-cli -h $REDIS_HOST -p $REDIS_PORT PING`
-  echo $PING_RESPONSE
+  PING_RESPONSE="$(timeout $BUSYTIMEFLAG 3 redis-cli -h $REDIS_HOST -p $REDIS_PORT PING)"
+  echo "$PING_RESPONSE"
   sleep 1
 done
 echo "INFO: redis is up"
