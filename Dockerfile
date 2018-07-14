@@ -2,7 +2,7 @@
 # (c) 2018 Jared Allard <jaredallard@outlook.com>
 #
 
-FROM mhart/alpine-node:9
+FROM mhart/alpine-node:10
 
 # Setup the core user
 # for some reason ping has the GID we want -- so use that
@@ -14,13 +14,8 @@ ENV DEBUG media:*
 WORKDIR /stack
 
 # Fix SSL. See https://github.com/Yelp/dumb-init/issues/73
-RUN echo '@edge http://dl-cdn.alpinelinux.org/alpine/edge/main' >> /etc/apk/repositories \
- && echo '@edge http://dl-cdn.alpinelinux.org/alpine/edge/community' >> /etc/apk/repositories \
- && echo '@edge http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
- && apk update \
- &&   apk --no-cache add ca-certificates wget \
- &&   update-ca-certificates \
- &&   apk upgrade --no-cache --no-self-upgrade --available
+RUN apk add --no-cache ca-certificates wget \
+&&  update-ca-certificates
 
 # Install our deps
 RUN apk add --no-cache dumb-init redis bash jq git
