@@ -65,7 +65,7 @@ echo "cmd: $(pwd)"
 echo -n "exec: "
 if [[ -z "$CMD" ]]; then
   echo "node index.js"
-  node index.js
+  exec node index.js
 else
   echo "${CMD}"
   "$CMD"
