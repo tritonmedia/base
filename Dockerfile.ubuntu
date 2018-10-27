@@ -1,0 +1,41 @@
+#
+# (c) 2018 Jared Allard <jaredallard@outlook.com>
+#
+
+FROM jaredallard/triton-base as base
+FROM phusion/baseimage
+
+# Setup the core user
+# for some reason ping has the GID we want -- so use that
+RUN addgroup --gid 999 ping && \
+    adduser --uid 999 --gid 999 --disabled-password --gecos "" media
+
+# "static" stuff
+ENTRYPOINT ["/usr/bin/docker-entrypoint"]
+ENV DEBUG media:*
+WORKDIR /stack
+
+# Install our dependencies
+RUN install_clean redis-tools jq wget && \
+    wget https://github.com/Yelp/dumb-init/releases/download/v1.2.1/dumb-init_1.2.1_amd64.deb && \
+    dpkg -i dumb-init_*.deb
+
+# Install node.js & yarh
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+  curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+  echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
+  install_clean yarn nodejs git
+
+# Install handbrake and ffmpeg
+RUN add-apt-repository ppa:stebbins/handbrake-git-snapshots -y && \
+    install_clean ffmpeg handbrake-cli trickle
+
+# Take the entrypoint from the base image
+COPY --from=base /usr/bin/docker-entrypoint /usr/bin/docker-entrypoint 
+RUN chmod +x /usr/bin/docker-entrypoint
+
+# Weird state issues?
+RUN rm -rf /stack /config && \
+    mkdir /stack /config && \
+    chown -R media:ping /stack /config && \
+    chmod -R 755 /stack /config

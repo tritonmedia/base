@@ -2,32 +2,25 @@ version: 2
 jobs:
   build:
     docker:
-      - image: docker:17.05.0-ce-git
+      - image: docker:18.06.1-ce
     steps:
       - checkout
       - setup_remote_docker
-      - restore_cache:
-          keys:
-            - v1-{{ .Branch }}
-          paths:
-            - /caches/base.tar
-      - run: docker build --cache-from=base -t base .
       - run:
-          name: Save Docker image layer cache
+          name: Build Docker Image
           command: |
-            mkdir -p /caches
-            docker save -o /caches/base.tar base
-      - save_cache:
-          key: v1-{{ .Branch }}-{{ epoch }}
-          paths:
-            - /caches/base.tar
+            set -e
+            docker build -t base -f .circleci/Dockerfile .
+            docker build -t base-ubuntu -f .circleci/Dockerfile.ubuntu .
       - run:
           name: Publish Docker Image
           command: |
             set -e
             docker login --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}"
-            docker tag base "jaredallard/triton-base:latest"
-            docker push "jaredallard/triton-base:latest"
+            docker tag base jaredallard/triton-base:latest
+            docker tag base-ubuntu jaredallard/triton-base:ubuntu
+            docker push jaredallard/triton-base:latest
+            docker push jaredallard/triton-base:ubuntu
 
 workflows:
   version: 2

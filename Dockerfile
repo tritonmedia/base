@@ -22,7 +22,6 @@ RUN apk add --no-cache dumb-init redis bash jq git
 
 # Copy over the entry-point
 COPY docker-entrypoint.sh /usr/bin/docker-entrypoint
-RUN chmod +x /usr/bin/docker-entrypoint
 
 # Weird state issues?
 RUN rm -rf /stack /config && \
