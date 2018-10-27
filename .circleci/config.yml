@@ -11,14 +11,14 @@ jobs:
           command: |
             set -e
             docker build -t base -f Dockerfile .
+            docker tag base jaredallard/triton-base:latest
             docker build -t base-ubuntu -f Dockerfile.ubuntu .
+            docker tag base-ubuntu jaredallard/triton-base:ubuntu
       - run:
           name: Publish Docker Image
           command: |
             set -e
             docker login --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}"
-            docker tag base jaredallard/triton-base:latest
-            docker tag base-ubuntu jaredallard/triton-base:ubuntu
             docker push jaredallard/triton-base:latest
             docker push jaredallard/triton-base:ubuntu
 
