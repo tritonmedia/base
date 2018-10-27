@@ -10,8 +10,8 @@ jobs:
           name: Build Docker Image
           command: |
             set -e
-            docker build -t base -f .circleci/Dockerfile .
-            docker build -t base-ubuntu -f .circleci/Dockerfile.ubuntu .
+            docker build -t base -f Dockerfile .
+            docker build -t base-ubuntu -f Dockerfile.ubuntu .
       - run:
           name: Publish Docker Image
           command: |
