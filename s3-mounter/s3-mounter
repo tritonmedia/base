@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+#
+# Mount s3 volumes
+
+out() {
+  echo "[mounter] $*"
+}
+
+error() {
+  out "ERROR: $*"
+}
+
+out "started at $(date)"
+
+if [[ -z "$BUCKET_NAME" ]]; then
+  error "Missing BUCKET_NAME"
+  exit 1
+fi
+
+if [[ -z "$MOUNT_DIR" ]]; then
+  error "Missing MOUNT_DIR"
+  exit 1
+fi
+
+# Check for creds
+if [[ ! -e "/mnt/google-creds/google-cred.json" ]]; then
+  error "Missing auth: '/mnt/google-creds/google-cred.json' not found"
+  exit 2
+fi
+
+out "creating mount dir: '$MOUNT_DIR'"
+mkdir -vp "$MOUNT_DIR"
+
+out "mounting via gcsfuse"
+exec gcsfuse --key-file /mnt/google-creds/google-cred.json --implicit-dirs --foreground \
+--uid 999 --gid 999 "$BUCKET_NAME" "$MOUNT_DIR"
