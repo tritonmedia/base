@@ -13,35 +13,15 @@ echo "Started: $(date)"
 echo "opts: $*"
 echo "user: $(whoami)"
 
-if [[ -z "$REDIS" ]]; then
-  export REDIS="redis://media-redis:6379"
-  echo "WARN: \$REDIS undefined, defaulting to prod config..."
+if [[ -z "$RABBITMQ" ]]; then
+  export RABBITMQ="amqp://user:bitnami@triton-rabbitmq"
+  echo "WARN: \$RABBITMQ undefined, defauting to prod config..."
 fi
 
 if [[ -z "$MEDIA" ]]; then
   export MEDIA="http://twilight:8001"
   echo "WARN: \$MEDIA undefined, defaulting to prod config..."
 fi
-
-REDIS_HOST=$(echo $REDIS | sed 's/redis:\/\///g' | awk -F ':' '{ print $1 }')
-REDIS_PORT=$(echo $REDIS | awk -F ':' '{ print $3 }')
-
-echo "INFO: waiting for redis '$REDIS' ($REDIS_HOST:$REDIS_PORT)"
-PING_RESPONSE=""
-while [[ $PING_RESPONSE != "PONG" ]]; do
-
-  # From: https://github.com/vishnubob/wait-for-it/blob/master/wait-for-it.sh
-  TIMEOUT_PATH=$(realpath "$(which timeout)")
-  BUSYTIMEFLAG=""
-  if [[ $TIMEOUT_PATH =~ "busybox" ]]; then
-    BUSYTIMEFLAG="-t"
-  fi
-
-  PING_RESPONSE="$(timeout $BUSYTIMEFLAG 3 redis-cli -h $REDIS_HOST -p $REDIS_PORT PING)"
-  echo "$PING_RESPONSE"
-  sleep 1
-done
-echo "INFO: redis is up"
 
 # Check for kubernetes mounted secrets
 if [[ ! -e "/mnt/config/config.yaml" ]]; then
