@@ -2,6 +2,8 @@
 #
 # Mount s3 volumes
 
+set -e
+
 out() {
   echo "[mounter] $*"
 }
@@ -22,15 +24,39 @@ if [[ -z "$MOUNT_DIR" ]]; then
   exit 1
 fi
 
-# Check for creds
-if [[ ! -e "/mnt/google-creds/google-cred.json" ]]; then
-  error "Missing auth: '/mnt/google-creds/google-cred.json' not found"
-  exit 2
-fi
-
 out "creating mount dir: '$MOUNT_DIR'"
 mkdir -vp "$MOUNT_DIR"
 
-out "mounting via gcsfuse"
-exec gcsfuse --key-file /mnt/google-creds/google-cred.json --implicit-dirs --foreground \
---uid 999 --gid 999 "$BUCKET_NAME" "$MOUNT_DIR"
+# Use gcs mode
+if [[ -e "/mnt/google-creds/google-cred.json" ]]; then
+  # error "Missing auth: '/mnt/google-creds/google-cred.json' not found"
+  out "mounting via gcsfuse"
+  set -x
+  exec gcsfuse --key-file /mnt/google-creds/google-cred.json --implicit-dirs --foreground \
+  --uid 999 --gid 999 "$BUCKET_NAME" "$MOUNT_DIR"
+fi
+
+if [[ -n "$S3_ACCESS_KEY" ]] && [[ -n "$S3_SECRET_KEY" ]]; then
+  out "mounting via goofys"
+  if [[ "$GOOFYS_CACHE_ENABLED" == "true" ]]; then
+    out "enabling catfs cach at /mnt/s3_cache"
+    cache_dir="/mnt/s3_cache"
+
+    if [[ -n "$GOOFYS_CACHE_DIR" ]]; then
+      cache_dir="$GOOFYS_CACHE_DIR"
+    fi
+
+    mkdir -p "$cache_dir"
+  
+    ADDITIONAL_OPTS="$ADDITIONAL_OPTS -o allow_other --cache --free:10%:$cache_dir --uid 999 --gid 999"
+  fi
+
+  if [[ "$GOOFYS_CHEAP" == "true" ]]; then
+    out "enabling cheap mode for goofys"
+    ADDITIONAL_OPTS="$ADDITIONAL_OPTS --cheap"
+  fi
+
+  set -x
+  AWS_ACCESS_KEY_ID=$S3_ACCESS_KEY AWS_SECRET_ACCESS_KEY=$S3_SECRET_KEY \
+  exec goofys -f --endpoint "$S3_ENDPOINT" ${ADDITIONAL_OPTS} "$BUCKET_NAME" "$MOUNT_DIR"
+fi
