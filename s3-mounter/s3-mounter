@@ -48,7 +48,7 @@ if [[ -n "$S3_ACCESS_KEY" ]] && [[ -n "$S3_SECRET_KEY" ]]; then
 
     mkdir -p "$cache_dir"
   
-    ADDITIONAL_OPTS="$ADDITIONAL_OPTS -o allow_other --cache --free:10%:$cache_dir --uid 999 --gid 999"
+    ADDITIONAL_OPTS="$ADDITIONAL_OPTS -o allow_other --cache --free:10%:$cache_dir"
   fi
 
   if [[ "$GOOFYS_CHEAP" == "true" ]]; then
@@ -58,5 +58,5 @@ if [[ -n "$S3_ACCESS_KEY" ]] && [[ -n "$S3_SECRET_KEY" ]]; then
 
   set -x
   AWS_ACCESS_KEY_ID=$S3_ACCESS_KEY AWS_SECRET_ACCESS_KEY=$S3_SECRET_KEY \
-  exec goofys -f --endpoint "$S3_ENDPOINT" ${ADDITIONAL_OPTS} "$BUCKET_NAME" "$MOUNT_DIR"
+  exec goofys -f --uid 999 --gid 999 --endpoint "$S3_ENDPOINT" ${ADDITIONAL_OPTS} "$BUCKET_NAME" "$MOUNT_DIR"
 fi
