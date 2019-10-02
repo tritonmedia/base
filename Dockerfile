@@ -1,5 +1,5 @@
 #
-# (c) 2018 Jared Allard <jaredallard@outlook.com>
+# (c) 2019 Jared Allard <jaredallard@outlook.com>
 #
 
 FROM mhart/alpine-node:12
