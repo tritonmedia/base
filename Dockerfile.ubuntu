@@ -3,7 +3,7 @@
 #
 
 FROM jaredallard/triton-base as base
-FROM phusion/baseimage
+FROM phusion/baseimage:0.11
 
 # Setup the core user
 # for some reason ping has the GID we want -- so use that
