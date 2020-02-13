@@ -1,4 +1,4 @@
-FROM debian:10.1-slim
+FROM debian:10.2-slim
 
 ENTRYPOINT [ "/bin/bash" ]
 CMD [ "/usr/bin/s3-mounter" ]
@@ -10,7 +10,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; apt-get update && apt-get install -y 
 &&  apt-get update; apt-get install -y --no-install-recommends fuse gcsfuse
 
 # goofys & catfs
-RUN wget https://github.com/kahing/goofys/releases/download/v0.21.0/goofys -O /usr/bin/goofys \
+RUN wget https://github.com/kahing/goofys/releases/download/v0.23.1/goofys -O /usr/bin/goofys \
 &&  wget https://github.com/kahing/catfs/releases/download/v0.8.0/catfs -O /usr/bin/catfs \
 &&  chmod +x /usr/bin/goofys /usr/bin/catfs
 

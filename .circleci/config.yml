@@ -1,30 +1,31 @@
-version: 2
 jobs:
   build:
     docker:
-      - image: docker:18.06.1-ce
+    - image: docker:19.03.5
     steps:
-      - checkout
-      - setup_remote_docker
-      - run:
-          name: Build Docker Image
-          command: |
-            set -e
-            docker build -t base -f Dockerfile .
-            docker tag base jaredallard/triton-base:latest
-            docker build -t base-ubuntu -f Dockerfile.ubuntu .
-            docker tag base-ubuntu jaredallard/triton-base:ubuntu
-      - run:
-          name: Publish Docker Image
-          command: |
-            set -e
-            docker login --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}"
-            docker push jaredallard/triton-base:latest
-            docker push jaredallard/triton-base:ubuntu
-
+    - checkout
+    - setup_remote_docker:
+        version: 18.09.3
+    - run:
+        command: DOCKER_BUILDKIT=1 docker build -t jaredallard/triton-base -f Dockerfile
+          .
+        name: Build "jaredallard/triton-base" Docker Image
+    - run:
+        command: echo "$DOCKER_PASSWORD" | docker login --username "${DOCKER_USERNAME}"
+          --password-stdin && docker push jaredallard/triton-base
+        name: Publish "jaredallard/triton-base" Docker Image
+    - run:
+        command: DOCKER_BUILDKIT=1 docker build -t jaredallard/triton-base:ubuntu
+          -f Dockerfile .
+        name: Build "jaredallard/triton-base:ubuntu" Docker Image
+    - run:
+        command: echo "$DOCKER_PASSWORD" | docker login --username "${DOCKER_USERNAME}"
+          --password-stdin && docker push jaredallard/triton-base:ubuntu
+        name: Publish "jaredallard/triton-base:ubuntu" Docker Image
+version: 2
 workflows:
-  version: 2
   build-push:
     jobs:
-      - build:
-          context: Docker
+    - build:
+        context: Docker
+  version: 2

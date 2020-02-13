@@ -1,5 +1,5 @@
 #
-# (c) 2019 Jared Allard <jaredallard@outlook.com>
+# (c) 2020 Jared Allard <jaredallard@outlook.com>
 #
 
 FROM jaredallard/triton-base as base
@@ -20,7 +20,7 @@ RUN install_clean redis-tools jq wget && \
     wget https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64.deb && \
     dpkg -i dumb-init_*.deb
 
-# Install node.js & yarh
+# Install node.js & yarn
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
