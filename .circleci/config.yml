@@ -16,7 +16,7 @@ jobs:
         name: Publish "tritonmedia/base" Docker Image
     - run:
         command: DOCKER_BUILDKIT=1 docker build --progress=plain -t tritonmedia/base:ubuntu
-          -f Dockerfile .
+          -f Dockerfile.ubuntu .
         name: Build "tritonmedia/base:ubuntu" Docker Image
     - run:
         command: echo "$DOCKER_PASSWORD" | docker login --username "${DOCKER_USERNAME}"
