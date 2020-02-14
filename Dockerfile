@@ -2,7 +2,7 @@
 # (c) 2019 Jared Allard <jaredallard@outlook.com>
 #
 
-FROM mhart/alpine-node:12
+FROM mhart/alpine-node:13
 
 # Setup the core user
 # for some reason ping has the GID we want -- so use that
@@ -14,11 +14,10 @@ ENV DEBUG media:*
 WORKDIR /stack
 
 # Fix SSL. See https://github.com/Yelp/dumb-init/issues/73
-RUN apk add --no-cache ca-certificates wget \
-&&  update-ca-certificates
-
 # Install our deps
-RUN apk add --no-cache dumb-init redis bash jq git
+RUN apk add --no-cache ca-certificates curl \
+&&  update-ca-certificates \
+&&  apk add --no-cache dumb-init bash jq git
 
 # Copy over the entry-point
 COPY docker-entrypoint.sh /usr/bin/docker-entrypoint

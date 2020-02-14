@@ -3,32 +3,35 @@
 #
 
 FROM tritonmedia/base as base
-FROM phusion/baseimage:0.11
+FROM debian:10.2-slim
+# "static" stuff
+ENTRYPOINT ["/usr/bin/docker-entrypoint"]
+ENV DEBUG media:*
+WORKDIR /stack
 
 # Setup the core user
 # for some reason ping has the GID we want -- so use that
 RUN addgroup --gid 999 ping && \
     adduser --uid 999 --gid 999 --disabled-password --gecos "" media
 
-# "static" stuff
-ENTRYPOINT ["/usr/bin/docker-entrypoint"]
-ENV DEBUG media:*
-WORKDIR /stack
+# install_clean for a small image
+COPY ./bin/install_clean /usr/local/bin/
 
 # Install our dependencies
-RUN install_clean redis-tools jq wget && \
-    wget https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64.deb && \
-    dpkg -i dumb-init_*.deb
+RUN install_clean ca-certificates jq curl trickle \
+&&  update-ca-certificates \
+&&  curl -L https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64.deb > dumb-init.deb \
+&&  dpkg -i dumb-init.deb \
+&&  rm dumb-init.deb 
 
 # Install node.js & yarn
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
-  curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-  echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
-  install_clean yarn nodejs git
+RUN curl -sL https://deb.nodesource.com/setup_13.x | bash - \
+&&  curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+&&  echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+&&  install_clean yarn nodejs git
 
-# Install handbrake and ffmpeg
-RUN add-apt-repository ppa:stebbins/handbrake-git-snapshots -y && \
-    install_clean ffmpeg handbrake-cli trickle
+# Install video-land deps
+RUN install_clean ffmpeg handbrake-cli
 
 # Take the entrypoint from the base image
 COPY --from=base /usr/bin/docker-entrypoint /usr/bin/docker-entrypoint 
