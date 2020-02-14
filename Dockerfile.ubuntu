@@ -2,7 +2,7 @@
 # (c) 2020 Jared Allard <jaredallard@outlook.com>
 #
 
-FROM jaredallard/triton-base as base
+FROM tritonmedia/base as base
 FROM phusion/baseimage:0.11
 
 # Setup the core user
