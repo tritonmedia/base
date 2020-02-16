@@ -31,4 +31,8 @@ workflows:
     jobs:
     - build:
         context: Docker
+        filters:
+          branches:
+            only:
+            - master
   version: 2
