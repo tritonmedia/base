@@ -23,6 +23,14 @@ jobs:
           --password-stdin && docker push tritonmedia/base:ubuntu
         name: Publish "tritonmedia/base:ubuntu" Docker Image
     - run:
+        command: DOCKER_BUILDKIT=1 docker build --progress=plain -t tritonmedia/testbed
+          -f Dockerfile.testbed .
+        name: Build "tritonmedia/testbed" Docker Image
+    - run:
+        command: echo "$DOCKER_PASSWORD" | docker login --username "${DOCKER_USERNAME}"
+          --password-stdin && docker push tritonmedia/testbed
+        name: Publish "tritonmedia/testbed" Docker Image
+    - run:
         command: .circleci/trigger-builds.sh
         name: Trigger Dependency Rebuilds
 version: 2
