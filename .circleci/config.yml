@@ -1,7 +1,7 @@
 jobs:
   build:
     docker:
-    - image: circleci/buildpack-deps:curl
+    - image: docker:19.03.6
     steps:
     - checkout
     - setup_remote_docker:
@@ -14,14 +14,13 @@ jobs:
         command: echo "$DOCKER_PASSWORD" | docker login --username "${DOCKER_USERNAME}"
           --password-stdin && docker push tritonmedia/base
         name: Publish "tritonmedia/base" Docker Image
-    - run:
-        command: DOCKER_BUILDKIT=1 docker build --progress=plain -t tritonmedia/base:ubuntu
-          -f Dockerfile.ubuntu .
-        name: Build "tritonmedia/base:ubuntu" Docker Image
-    - run:
-        command: echo "$DOCKER_PASSWORD" | docker login --username "${DOCKER_USERNAME}"
-          --password-stdin && docker push tritonmedia/base:ubuntu
-        name: Publish "tritonmedia/base:ubuntu" Docker Image
+  build-testbed:
+    docker:
+    - image: docker:19.03.6
+    steps:
+    - checkout
+    - setup_remote_docker:
+        version: 18.09.3
     - run:
         command: DOCKER_BUILDKIT=1 docker build --progress=plain -t tritonmedia/testbed
           -f Dockerfile.testbed .
@@ -30,6 +29,28 @@ jobs:
         command: echo "$DOCKER_PASSWORD" | docker login --username "${DOCKER_USERNAME}"
           --password-stdin && docker push tritonmedia/testbed
         name: Publish "tritonmedia/testbed" Docker Image
+  build-ubuntu:
+    docker:
+    - image: docker:19.03.6
+    steps:
+    - checkout
+    - setup_remote_docker:
+        version: 18.09.3
+    - run:
+        command: DOCKER_BUILDKIT=1 docker build --progress=plain -t tritonmedia/base:ubuntu
+          -f Dockerfile.ubuntu .
+        name: Build "tritonmedia/base:ubuntu" Docker Image
+    - run:
+        command: echo "$DOCKER_PASSWORD" | docker login --username "${DOCKER_USERNAME}"
+          --password-stdin && docker push tritonmedia/base:ubuntu
+        name: Publish "tritonmedia/base:ubuntu" Docker Image
+  trigger-rebuilds:
+    docker:
+    - image: circleci/buildpack-deps:curl
+    steps:
+    - checkout
+    - setup_remote_docker:
+        version: 18.09.3
     - run:
         command: .circleci/trigger-builds.sh
         name: Trigger Dependency Rebuilds
@@ -39,8 +60,13 @@ workflows:
     jobs:
     - build:
         context: Docker
-        filters:
-          branches:
-            only:
-            - master
+    - build-ubuntu:
+        context: Docker
+    - trigger-rebuilds:
+        context: Docker
+        requires:
+        - build
+        - build-ubuntu
+    - build-testbed:
+        context: Docker
   version: 2
