@@ -1,6 +1,6 @@
 FROM golang:1.13-alpine
 
 # install our deps
-RUN apk add --no-cache python py-pip jq bash docker-cli curl \
+RUN apk add --no-cache python py-pip jq bash docker-cli curl make \
 &&  apk add --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing jsonnet \
 &&  pip install yq
