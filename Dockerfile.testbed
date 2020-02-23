@@ -3,6 +3,6 @@ FROM golang:1.13-alpine
 ENV CGO_ENABLED=0
 
 # install our deps
-RUN apk add --no-cache python py-pip jq bash docker-cli curl make git \
+RUN apk add --no-cache python py-pip jq bash docker-cli curl make git openssh-client \
 &&  apk add --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing jsonnet \
 &&  pip install yq
