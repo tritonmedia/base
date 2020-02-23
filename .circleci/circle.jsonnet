@@ -26,7 +26,10 @@ circle.ServiceConfig('base') {
     ['build-push']: circle.Workflow(){
       jobs_:: [
         'build',
-        'build-ubuntu',
+        {
+          name:: 'build-ubuntu',
+          requires: ['build'],
+        },
         {
           name:: 'trigger-rebuilds',
           requires: ['build', 'build-ubuntu'],
