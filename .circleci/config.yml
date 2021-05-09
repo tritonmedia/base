@@ -1,7 +1,7 @@
 jobs:
   build:
     docker:
-    - image: docker:19.03.8
+    - image: docker:19.03.15
     steps:
     - checkout
     - setup_remote_docker:
@@ -16,7 +16,7 @@ jobs:
         name: Publish "tritonmedia/base" Docker Image
   build-testbed:
     docker:
-    - image: docker:19.03.8
+    - image: docker:19.03.15
     steps:
     - checkout
     - setup_remote_docker:
@@ -31,7 +31,7 @@ jobs:
         name: Publish "tritonmedia/testbed" Docker Image
   build-ubuntu:
     docker:
-    - image: docker:19.03.8
+    - image: docker:19.03.15
     steps:
     - checkout
     - setup_remote_docker:
