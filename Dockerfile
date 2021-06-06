@@ -2,7 +2,7 @@
 # (c) 2019 Jared Allard <jaredallard@outlook.com>
 #
 
-FROM mhart/alpine-node:13
+FROM mhart/alpine-node:16
 
 # Setup the core user
 # for some reason ping has the GID we want -- so use that
