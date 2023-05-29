@@ -3,7 +3,7 @@
 #
 
 FROM tritonmedia/base as base
-FROM debian:10.2-slim
+FROM debian:11.7-slim
 # "static" stuff
 ENTRYPOINT ["/usr/bin/docker-entrypoint"]
 ENV DEBUG media:*
