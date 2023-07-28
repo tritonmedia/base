@@ -1,4 +1,4 @@
-FROM debian:10.2-slim
+FROM debian:12.1-slim
 
 ENTRYPOINT [ "/bin/bash" ]
 CMD [ "/usr/bin/s3-mounter" ]
